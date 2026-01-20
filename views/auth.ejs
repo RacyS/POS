@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
-  <title><%= title %></title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-   <!-- Bootstrap CDN (Content Delivery Network)-->
-  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-   <!-- jQuery CDN -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-</head>
+    <title><%= title %></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    
+  </head>
   <body>
     <div class="container-fluid">
-		<h1>login</h1>
-		<form role="form" method="GET">
-		  <div class="form-group">
+      <h1>login</h1>
+      <form role="form" method="GET">
+        <div class="form-group">
             <input type="text" id="Ename" name="Ename" placeholder="Email">
-            <input type="text" id="Pame" name="Pname" placeholder="Password">
-		  </div>
-          	<button type="button" class="btn btn-primary">Convert</button>
-		</form>
-	</div>
+            <input type="text" id="Pame" name="Pname" placeholder="Password"><br>
+            <input type="checkbox">remember me
+        </div>
+        <button type="button" class="0 text-white p-2 rounded">login</button>
+      </form>
+    </div>
   </body>
 </html>
