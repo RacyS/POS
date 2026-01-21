@@ -8,16 +8,16 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
     
   </head>
-  <body>
-    <div class="container-fluid">
-      <h1>login</h1>
-      <form role="form" method="GET">
-        <div class="form-group">
-            <input type="text" id="Ename" name="Ename" placeholder="Email">
-            <input type="text" id="Pame" name="Pname" placeholder="Password"><br>
-            <input type="checkbox">remember me
-        </div>
-        <button type="button" class="0 text-white p-2 rounded">login</button>
+  <body class="min-h-screen flex justify-center items-center m-0 bg-gradient-to-r from-green-400 to-blue-500">
+    <div class="bg-white p-8 rounded shadow w-80">
+      <h1 class="text-center text-2xl mb-4">Login</h1>
+      <form method="POST" class="flex flex-col gap-4">
+        <input type="text" name="Ename" placeholder="Email" class="border p-2 rounded">
+        <input type="password" name="Pname" placeholder="Password" class="border p-2 rounded">
+        <label class="flex items-center gap-2 text-sm w-min">
+          <input type="checkbox"> remember
+        </label>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-2 rounded-xl">Login</button>
       </form>
     </div>
   </body>
