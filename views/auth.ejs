@@ -6,19 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     
   </head>
   <body class="min-h-screen flex justify-center items-center m-0 bg-gradient-to-r from-green-400 to-blue-500">
     <div class="bg-white p-8 rounded shadow w-80">
       <h1 class="text-center text-2xl mb-4">Login</h1>
-      <form method="POST" class="flex flex-col gap-4">
-        <input type="text" name="Ename" placeholder="Email" class="border p-2 rounded">
-        <input type="password" name="Pname" placeholder="Password" class="border p-2 rounded">
+      <form method="POST" id="loginForm" class="flex flex-col gap-4">
+
+        <input type="text" id="email" name="Ename" placeholder="Email" class="border p-2 rounded">
+        <input type="password" id="password_User" name="Pname" placeholder="Password" class="border p-2 rounded">
+
         <label class="flex items-center gap-2 text-sm w-min">
           <input type="checkbox"> remember
         </label>
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-2 rounded-xl">Login</button>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-2 rounded-xl" id="btn1">Login</button>
       </form>
     </div>
+    <script>
+      $("#loginForm").submit(function(e){
+        e.preventDefault();
+        let email = $("#email").val();
+        let password = $("#password_User").val();
+        let Userdata= {
+          Uemail: email,
+          Upassword: password
+        };
+        console.log("Sending data:", Userdata);
+
+        $.post("/LoginData",Userdata)
+        .done(function(response){
+          alert("Login Sucess");
+        })
+        .fail(function(xhr){
+          alert("Login failed: " + xhr.responseText);
+        })
+      })
+    </script>
   </body>
 </html>

@@ -7,5 +7,9 @@ var authController = require('../controllers/authController')
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-router.get('/login', authController.getLoginPage);
+router.get('/login', function(req, res, next) {
+  res.render('auth', { title: 'LOGIN' });
+});
+router.post('/LoginData', authController.FuncLogin)
+
 module.exports = router;

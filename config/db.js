@@ -16,6 +16,6 @@ module.exports = {
             process.exit(1);
         }
     },getDb: function(){
-        reutrn_db;
+        return _db;
     }
 };
