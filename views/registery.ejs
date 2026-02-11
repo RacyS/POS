@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <link rel="stylesheet" href="/stylesheets/style.css">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    </head>
+    <body class="min-h-screen flex justify-center items-center m-0 bg-gradient-to-r from-green-400 to-blue-500">
+         <div class="bg-white p-8 rounded shadow w-80">
+            <h1 class="text-center text-2xl mb-4">Register</h1>
+            <form method="POST" id="registerForm" class="flex flex-col gap-4">
+            <input type="text" id="email" name="Ename" placeholder="Email" class="border p-2 rounded">
+            <input type="password" id="password_User" name="Pname" placeholder="Password" class="border p-2 rounded">
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white py-2 rounded-xl" id="btn1">Register now</button>
+        </form>
+    </div>
+    <script>
+        $("#registerForm").submit(function(e){
+            e.preventDefault();
+            let email = $("#email").val();
+            let password = $("#password_User").val();
+            let Userdata= {
+            Uemail: email,
+            Upassword: password
+        };
+        $.post("/RegisterForm",Userdata)
+         .done(function(response){
+          alert("Login Sucess");
+        })
+    })
+    </script>
+    </body>
+</html>
