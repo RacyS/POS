@@ -36,12 +36,15 @@
 
         $.post("/LoginData",Userdata)
         .done(function(response){
-          alert("Login Sucess");
+          if (response.redirectUrl) {
+            // สั่งให้ Browser เปลี่ยนหน้าไปยัง URL ที่ Server ส่งมา
+            window.location.href = response.redirectUrl;
+          }
         })
         .fail(function(xhr){
           alert("Login failed: " + xhr.responseText);
-        })
-      })
+        });
+      });
     </script>
   </body>
 </html>

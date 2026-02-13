@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Prompt', 'Sarabun', sans-serif;
+        }
+        
+        .gallery-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+        
+        .gallery-card:hover img {
+            transform: scale(1.1);
+        }
+        
+        .gallery-card img {
+            transition: transform 0.5s ease;
+        }
+        
+        .card-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .card-shine:hover::before {
+            left: 100%;
+        }
+        
+        .stagger-animation {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .image-overlay {
+            background: linear-gradient(180deg, transparent 0%, transparent 50%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="h-full overflow-auto bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+    
+    <nav class="bg-black fixed w-full z-20 top-0 start-0 border-b border-gray-800">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <a class="flex items-center space-x-3">
+                <span class="self-center text-xl font-semibold whitespace-nowrap text-white">ร้านจุ๊บอาหารตามสั่ง</span>
+            </a>
+            <div class="flex items-center md:order-2 gap-4">
+                <div class="relative hidden md:block">
+                    <input type="text" class="block w-full px-3 py-2 bg-white/10 border border-gray-700 text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400" placeholder="ค้นหาเมนู...">
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-semibold">
+                        <%= (typeof userName !== 'undefined') ? userName.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                    <span class="hidden md:block text-white font-medium"><%= (typeof userName !== 'undefined') ? userName : 'User' %></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="app-container" class="min-h-full w-full px-4 md:px-8 py-24">
+        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"></div>
+    </div>
+    
+    <script src="/javascripts/Menu.js"></script>
+    <script>
+        // แก้ไข: ใช้ getElementById ให้ตรงกับ ID ใน HTML
+        const galleryContainer = document.getElementById('gallery');
+        
+        if (galleryContainer) {
+            for(let i = 1; i <= 66; i++) {
+                const menuName = (typeof menuItems !== 'undefined' && menuItems[i-1]) 
+                                 ? menuItems[i-1].name 
+                                 : (typeof menuNames !== 'undefined' && menuNames[i-1] ? menuNames[i-1] : `เมนูที่ ${i}`);
+
+                const card = document.createElement('div');
+                card.className = 'gallery-card card-shine bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl glow-effect stagger-animation';
+                card.style.animationDelay = `${(i % 12) * 0.05}s`;
+
+                card.innerHTML = `
+                    <div class="relative overflow-hidden">
+                        <img 
+                            src="/images/${encodeURIComponent('kubข้าว')}/kub${i}.jpg" 
+                            alt="${menuName}"
+                            class="w-full h-56 object-cover"
+                            loading="lazy"
+                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23f3e8ff%22 width=%22400%22 height=%22300%22/><text x=%22200%22 y=%22150%22 text-anchor=%22middle%22 font-size=%2248%22>🍽️</text></svg>';"
+                        >
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-xs font-semibold text-purple-600 shadow">
+                            #${i}
+                        </div>
+                    </div>
+                    <div class="p-4 text-center">
+                        <h3 class="text-lg font-semibold text-gray-800 ">${menuName}</h3>
+                    </div>
+                `;
+                galleryContainer.appendChild(card);
+            }
+        }
+    </script>
+</body>
+</html>
