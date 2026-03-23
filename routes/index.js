@@ -5,8 +5,8 @@ var registerController = require('../controllers/registerController')
 const { checkLogin } = require('../middleware/auth');
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/menu', function(req, res, next) {
+  res.render('dashboardNologin', { title: 'Menu' });
 });
 router.get('/login', function(req, res, next) {
   res.render('auth', { title: 'LOGIN' });
@@ -24,5 +24,6 @@ router.get('/dashboard', checkLogin, (req, res) => {
         userName: req.session.userEmail 
     });
 });
+
 
 module.exports = router;
