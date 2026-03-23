@@ -6,7 +6,7 @@ const { checkLogin } = require('../middleware/auth');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('Login', { title: 'Login' });
+  res.render('auth', { title: 'Login' });
 });
 router.get('/login', function(req, res, next) {
   res.render('auth', { title: 'LOGIN' });
