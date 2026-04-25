@@ -1,211 +1,519 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เมนูอาหาร - ร้านจุ๊บ</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            font-family: 'Prompt', 'Sarabun', sans-serif;
-        }
-        
+        * { font-family: 'Prompt', 'Sarabun', sans-serif; }
+
         .gallery-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
         .gallery-card:hover {
-            transform: translateY(-8px) scale(1.02);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
         }
-        
-        .gallery-card:hover img {
-            transform: scale(1.1);
-        }
-        
         .gallery-card img {
-            transition: transform 0.5s ease;
+            transition: transform 0.4s ease;
         }
-        
-        .card-shine {
-            position: relative;
-            overflow: hidden;
+        .gallery-card:hover img {
+            transform: scale(1.08);
         }
-        
-        .card-shine::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-            z-index: 10;
-            pointer-events: none;
-        }
-        
-        .card-shine:hover::before {
-            left: 100%;
-        }
-        
+
         .stagger-animation {
             opacity: 0;
-            animation: fadeInUp 0.6s ease forwards;
+            animation: fadeInUp 0.5s ease forwards;
         }
-        
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        
-        .image-overlay {
-            background: linear-gradient(180deg, transparent 0%, transparent 50%, rgba(0,0,0,0.7) 100%);
+
+        /* Cart drawer */
+        #cart-drawer {
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        .glow-effect {
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.15);
+        #cart-drawer.open {
+            transform: translateX(0);
         }
-        
-        ::-webkit-scrollbar {
-            width: 10px;
+        #cart-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
         }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+        #cart-overlay.open {
+            opacity: 1;
+            pointer-events: all;
         }
-        
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 10px;
+
+        /* Qty controls */
+        .qty-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+            user-select: none;
         }
+        .qty-btn:hover { filter: brightness(1.15); transform: scale(1.1); }
+        .qty-btn:active { transform: scale(0.95); }
+
+        /* Category active pill */
+        .cat-btn.active {
+            background: linear-gradient(135deg, #7c3aed, #9333ea);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(124,58,237,0.4);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #9333ea; border-radius: 10px; }
+
+        .badge-bounce {
+            animation: bounce-once 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
+        @keyframes bounce-once {
+            0%,100% { transform: scale(1); }
+            40%      { transform: scale(1.4); }
+            70%      { transform: scale(0.9); }
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="h-full overflow-auto bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
-    
 
-<nav class="bg-black fixed w-full z-30 top-0 start-0 border-b border-gray-800 h-[72px]">
-    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
-                <span class="text-purple-500">ร้านจุ๊บ</span>อาหารตามสั่ง
+<!-- ===== NAVBAR ===== -->
+<nav class="bg-black fixed w-full z-30 top-0 border-b border-gray-800 h-[68px]">
+    <div class="max-w-screen-xl flex items-center justify-between mx-auto px-4 h-full">
+        <!-- Brand -->
+        <a class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
+            <span class="text-xl font-bold text-white">
+                <span class="text-purple-400">ร้านจุ๊บ</span>อาหารตามสั่ง
             </span>
         </a>
-        <div class="flex items-center md:order-2 gap-4">
+
+        <!-- Search + User + Cart -->
+        <div class="flex items-center gap-3">
+            <!-- Search bar (desktop) -->
             <div class="relative hidden md:block">
-                <input type="text" class="block w-64 px-4 py-2 bg-white/5 border border-gray-700 text-white text-sm rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none placeholder:text-gray-500 transition-all" placeholder="ค้นหาเมนูอร่อย...">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                </span>
+                <input id="search-input" type="text"
+                    class="block w-60 pl-9 pr-4 py-2 bg-white/8 border border-gray-700 text-white text-sm rounded-full focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none placeholder:text-gray-500 transition-all"
+                    placeholder="ค้นหาเมนู...">
             </div>
-            
-            <div class="flex items-center gap-3 cursor-pointer hover:bg-white/5 p-1 rounded-full pr-4 transition-colors">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-900/20">
+
+            <!-- User -->
+            <div class="flex items-center gap-2 cursor-pointer hover:bg-white/5 px-3 py-1 rounded-full transition-colors">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     <%= (typeof userName !== 'undefined') ? userName.charAt(0).toUpperCase() : 'U' %>
                 </div>
-                <span class="hidden md:block text-gray-300 font-medium text-sm"><%= (typeof userName !== 'undefined') ? userName : 'User' %></span>
+                <span class="hidden md:block text-gray-300 text-sm font-medium">
+                    <%= (typeof userName !== 'undefined') ? userName : 'User' %>
+                </span>
             </div>
+
+            <!-- Cart button -->
+            <button id="cart-btn" class="relative flex items-center gap-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white px-4 py-2 rounded-full transition-all font-medium text-sm shadow-lg shadow-purple-900/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9m5-9l2 9"/>
+                </svg>
+                <span class="hidden sm:inline">ตะกร้า</span>
+                <span id="cart-count" class="hidden absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+            </button>
         </div>
     </div>
 </nav>
 
-<nav id="category-nav" class="fixed top-[72px] w-full z-20 bg-black/95 backdrop-blur-md border-b border-gray-800 shadow-md" >
-    <div class="max-w-screen-xl mx-auto px-4 py-3">
-        <div class="flex overflow-x-auto gap-3 pb-1 md:justify-center no-scrollbar items-center">
-            
-            <button value="all" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium bg-purple-600 text-white shadow-lg shadow-purple-900/40 transition-all transform hover:scale-105 active:scale-95">
-                ทั้งหมด
-            </button>
-
-            <button value="kub" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                กับข้าว
-            </button>
-            
-            <button value="noodle" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                เมนูเส้น
-            </button>
-            
-            <button value="rice" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                อาหารจานเดียว
-            </button>
-            
-            <button value="set" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                เซตสุดคุ้ม
-            </button>
-            
-            <button value="tom" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                ต้มยำ/แกง
-            </button>
-            
-            <button value="yom" class="whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium text-gray-300 bg-gray-800/50 border border-gray-700 hover:bg-gray-700 hover:text-white hover:border-gray-500 transition-all active:scale-95">
-                ยำรสเด็ด
-            </button>
+<!-- ===== CATEGORY NAV ===== -->
+<nav id="category-nav" class="fixed top-[68px] w-full z-20 bg-black/95 backdrop-blur-md border-b border-gray-800">
+    <div class="max-w-screen-xl mx-auto px-4 py-2.5">
+        <!-- Mobile search -->
+        <div class="block md:hidden mb-2">
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                    </svg>
+                </span>
+                <input id="search-input-mobile" type="text"
+                    class="block w-full pl-9 pr-4 py-2 bg-white/8 border border-gray-700 text-white text-sm rounded-full focus:ring-2 focus:ring-purple-500 outline-none placeholder:text-gray-500"
+                    placeholder="ค้นหาเมนู...">
+            </div>
+        </div>
+        <div class="flex overflow-x-auto gap-2 pb-1 no-scrollbar">
+            <button data-cat="all" class="cat-btn active whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium border border-transparent transition-all active:scale-95">ทั้งหมด</button>
+            <button data-cat="kub"    class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">กับข้าว</button>
+            <button data-cat="noodle" class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">เมนูเส้น</button>
+            <button data-cat="rice"   class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">อาหารจานเดียว</button>
+            <button data-cat="set"    class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">เซตสุดคุ้ม</button>
+            <button data-cat="tom"    class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">ต้มยำ/แกง</button>
+            <button data-cat="yom"    class="cat-btn whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium text-gray-300 bg-gray-800/60 border border-gray-700 hover:bg-gray-700 hover:text-white transition-all active:scale-95">ยำรสเด็ด</button>
         </div>
     </div>
-</nav> <br> <br>
-    <div id="app-container" class="min-h-full w-full px-4 md:px-8 py-24">
-        <div id="gallery" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"></div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div id="app-container" class="min-h-screen w-full px-4 md:px-8 pt-[148px] pb-10">
+    <!-- Result count -->
+    <p id="result-count" class="max-w-7xl mx-auto text-gray-500 text-sm mb-4"></p>
+    <!-- Grid -->
+    <div id="gallery" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-w-7xl mx-auto"></div>
+    <!-- Empty state -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-24 text-center max-w-7xl mx-auto">
+        <div class="text-6xl mb-4">🔍</div>
+        <p class="text-gray-500 text-lg font-medium">ไม่พบเมนูที่ค้นหา</p>
+        <p class="text-gray-400 text-sm mt-1">ลองค้นหาด้วยคำอื่น หรือเลือกหมวดหมู่อื่น</p>
     </div>
-    
-    <script src="/javascripts/Menu.js"></script>
-    <script>
-        // แก้ไข: ใช้ getElementById ให้ตรงกับ ID ใน HTML
-        const galleryContainer = document.getElementById('gallery');
-        function renderMenus(data) {
-            galleryContainer.innerHTML = '';
-            data.forEach((menu, index)=>{
-                const card = document.createElement('div');
-                card.className = 'gallery-card card-shine bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl glow-effect stagger-animation';
-                card.style.animationDelay = `${(index % 12) * 0.05}s`;
+</div>
 
-                card.innerHTML = ` 
-                    <div class="relative overflow-hidden"> 
-                        <img 
-                            src="${menu.image}" 
-                            alt="${menu.name}"
-                            class="w-full h-56 object-cover"
-                            loading="lazy"
-                            onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23f3e8ff%22 width=%22400%22 height=%22300%22/><text x=%22200%22 y=%22150%22 text-anchor=%22middle%22 font-size=%2248%22>🍽️</text></svg>';"
-                        >
+<!-- ===== CART OVERLAY ===== -->
+<div id="cart-overlay" class="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" onclick="closeCart()"></div>
+
+<!-- ===== CART DRAWER ===== -->
+<div id="cart-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 flex flex-col shadow-2xl">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-purple-600 to-purple-700">
+        <div class="flex items-center gap-2 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m5-9v9m4-9v9m5-9l2 9"/>
+            </svg>
+            <span class="font-bold text-lg">ตะกร้าสินค้า</span>
+            <span id="drawer-count" class="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">0 รายการ</span>
+        </div>
+        <button onclick="closeCart()" class="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Cart items list -->
+    <div id="cart-items" class="flex-1 overflow-y-auto px-4 py-3 space-y-3"></div>
+
+    <!-- Empty cart -->
+    <div id="cart-empty" class="flex-1 flex flex-col items-center justify-center text-center px-8 py-12">
+        <div class="text-6xl mb-4">🛒</div>
+        <p class="text-gray-500 font-medium text-lg">ยังไม่มีรายการ</p>
+        <p class="text-gray-400 text-sm mt-1">เพิ่มเมนูที่คุณต้องการลงในตะกร้า</p>
+    </div>
+
+    <!-- Footer summary -->
+    <div id="cart-footer" class="hidden border-t bg-gray-50 px-5 py-4 space-y-3">
+        <div class="flex justify-between text-sm text-gray-500">
+            <span>รวมทั้งหมด</span>
+            <span id="cart-qty-total">0 รายการ</span>
+        </div>
+        <div class="flex justify-between text-lg font-bold text-gray-800">
+            <span>ราคารวม</span>
+            <span id="cart-total" class="text-purple-600">฿0</span>
+        </div>
+        <button onclick="confirmOrder()" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 active:scale-[0.98] text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-purple-900/25 flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            ยืนยันคำสั่งซื้อ
+        </button>
+        <button onclick="clearCart()" class="w-full bg-gray-100 hover:bg-gray-200 active:scale-[0.98] text-gray-600 font-medium py-2 rounded-xl transition-all text-sm">
+            ล้างตะกร้า
+        </button>
+    </div>
+</div>
+
+<!-- ===== ORDER SUCCESS TOAST ===== -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+    <div class="bg-green-600 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span id="toast-msg">สั่งอาหารเรียบร้อย!</span>
+    </div>
+</div>
+
+<script src="/javascripts/Menu.js"></script>
+<script>
+// ============================================================
+// PRICE GENERATION (deterministic per item)
+// ============================================================
+const priceBase = { kub: 70, noodle: 55, rice: 50, set: 130, tom: 90, yom: 65, rap: 65 };
+function getPrice(menu) {
+    const base = priceBase[menu.category] || 60;
+    const variation = ((menu.id * 13 + 7) % 5) * 10; // 0,10,20,30,40
+    return base + variation;
+}
+
+// ============================================================
+// CATEGORY LABELS & COLORS
+// ============================================================
+const catLabel = { kub:'กับข้าว', noodle:'เมนูเส้น', rice:'จานเดียว', set:'เซต', tom:'ต้มยำ/แกง', yom:'ยำ', rap:'ยำ' };
+const catColor  = {
+    kub:'bg-orange-100 text-orange-700',
+    noodle:'bg-yellow-100 text-yellow-700',
+    rice:'bg-green-100 text-green-700',
+    set:'bg-blue-100 text-blue-700',
+    tom:'bg-red-100 text-red-700',
+    yom:'bg-pink-100 text-pink-700',
+    rap:'bg-pink-100 text-pink-700'
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let cart = {}; // { menuId: { menu, qty } }
+let activeCategory = 'all';
+let searchQuery = '';
+
+// ============================================================
+// RENDER GALLERY
+// ============================================================
+const gallery = document.getElementById('gallery');
+const emptyState = document.getElementById('empty-state');
+const resultCount = document.getElementById('result-count');
+
+function getFilteredMenus() {
+    return menuall.filter(m => {
+        const matchCat = activeCategory === 'all' || m.category === activeCategory;
+        const matchSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCat && matchSearch;
+    });
+}
+
+function renderMenus() {
+    const data = getFilteredMenus();
+    gallery.innerHTML = '';
+
+    if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        resultCount.textContent = '';
+        return;
+    }
+    emptyState.classList.add('hidden');
+    emptyState.classList.remove('flex');
+    resultCount.textContent = `แสดง ${data.length} เมนู`;
+
+    data.forEach((menu, index) => {
+        const price = getPrice(menu);
+        const inCart = cart[menu.id];
+        const qty = inCart ? inCart.qty : 0;
+
+        const card = document.createElement('div');
+        card.className = 'gallery-card bg-white rounded-2xl overflow-hidden shadow-md stagger-animation flex flex-col';
+        card.style.animationDelay = `${(index % 20) * 0.04}s`;
+        card.dataset.id = menu.id;
+
+        card.innerHTML = `
+            <div class="relative overflow-hidden bg-gray-100">
+                <img
+                    src="${menu.image}"
+                    alt="${menu.name}"
+                    class="w-full h-40 object-cover"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22><rect fill=%22%23f3e8ff%22 width=%22400%22 height=%22300%22/><text x=%22200%22 y=%22160%22 text-anchor=%22middle%22 font-size=%2264%22>🍽️</text></svg>';"
+                >
+                <span class="absolute top-2 left-2 text-xs font-medium px-2 py-0.5 rounded-full ${catColor[menu.category] || 'bg-gray-100 text-gray-600'}">
+                    ${catLabel[menu.category] || menu.category}
+                </span>
+            </div>
+            <div class="p-3 flex flex-col flex-1 gap-1">
+                <h3 class="text-sm font-semibold text-gray-800 leading-tight line-clamp-2 flex-1">${menu.name}</h3>
+                <div class="flex items-center justify-between mt-2">
+                    <span class="text-purple-600 font-bold text-base">฿${price}</span>
+                    ${qty === 0
+                        ? `<button onclick="addToCart(${menu.id})" class="add-btn bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs font-bold px-3 py-1.5 rounded-full transition-all shadow">+ เพิ่ม</button>`
+                        : `<div class="flex items-center gap-1">
+                               <button onclick="decreaseQty(${menu.id})" class="qty-btn bg-red-100 text-red-600 hover:bg-red-200">−</button>
+                               <span class="w-6 text-center text-sm font-bold text-gray-800">${qty}</span>
+                               <button onclick="increaseQty(${menu.id})" class="qty-btn bg-purple-100 text-purple-600 hover:bg-purple-200">+</button>
+                           </div>`
+                    }
+                </div>
+            </div>
+        `;
+        gallery.appendChild(card);
+    });
+}
+
+// ============================================================
+// CART LOGIC
+// ============================================================
+function addToCart(id) {
+    const menu = menuall.find(m => m.id === id);
+    if (!menu) return;
+    if (cart[id]) {
+        cart[id].qty++;
+    } else {
+        cart[id] = { menu, qty: 1, price: getPrice(menu) };
+    }
+    renderMenus();
+    updateCartUI();
+    animateBadge();
+}
+
+function increaseQty(id) {
+    if (cart[id]) { cart[id].qty++; renderMenus(); updateCartUI(); animateBadge(); }
+}
+
+function decreaseQty(id) {
+    if (!cart[id]) return;
+    cart[id].qty--;
+    if (cart[id].qty <= 0) delete cart[id];
+    renderMenus();
+    updateCartUI();
+}
+
+function removeFromCart(id) {
+    delete cart[id];
+    renderMenus();
+    updateCartUI();
+}
+
+function clearCart() {
+    cart = {};
+    renderMenus();
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const items = Object.values(cart);
+    const totalQty = items.reduce((s, i) => s + i.qty, 0);
+    const totalPrice = items.reduce((s, i) => s + i.qty * i.price, 0);
+
+    // Badge
+    const badge = document.getElementById('cart-count');
+    if (totalQty > 0) {
+        badge.textContent = totalQty > 99 ? '99+' : totalQty;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+
+    // Drawer count
+    document.getElementById('drawer-count').textContent = `${totalQty} รายการ`;
+
+    // Items list
+    const listEl = document.getElementById('cart-items');
+    const emptyEl = document.getElementById('cart-empty');
+    const footerEl = document.getElementById('cart-footer');
+
+    if (items.length === 0) {
+        listEl.classList.add('hidden');
+        emptyEl.classList.remove('hidden');
+        footerEl.classList.add('hidden');
+    } else {
+        listEl.classList.remove('hidden');
+        emptyEl.classList.add('hidden');
+        footerEl.classList.remove('hidden');
+        listEl.innerHTML = items.map(item => `
+            <div class="flex gap-3 bg-gray-50 rounded-xl p-3">
+                <img src="${item.menu.image}" alt="${item.menu.name}" class="w-16 h-16 rounded-lg object-cover bg-gray-200 flex-shrink-0"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect fill=%22%23f3e8ff%22 width=%2264%22 height=%2264%22/><text x=%2232%22 y=%2240%22 text-anchor=%22middle%22 font-size=%2228%22>🍽️</text></svg>'">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-gray-800 line-clamp-2 leading-tight">${item.menu.name}</p>
+                    <p class="text-purple-600 font-bold text-sm mt-1">฿${item.price} × ${item.qty} = <span class="text-purple-700">฿${item.price * item.qty}</span></p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <button onclick="decreaseQty(${item.menu.id})" class="qty-btn bg-red-100 text-red-600 hover:bg-red-200">−</button>
+                        <span class="w-6 text-center text-sm font-bold">${item.qty}</span>
+                        <button onclick="increaseQty(${item.menu.id})" class="qty-btn bg-purple-100 text-purple-600 hover:bg-purple-200">+</button>
+                        <button onclick="removeFromCart(${item.menu.id})" class="ml-auto text-gray-400 hover:text-red-500 transition-colors p-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="p-4 text-center">
-                        <h3 class="text-lg font-semibold text-gray-800 ">${menu.name}</h3>
-                    </div>
-                `;
-                galleryContainer.appendChild(card);
-            })
-        }
-  const categories = document.querySelectorAll('#category-nav button');
-  categories.forEach(btn => {
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('cart-qty-total').textContent = `${totalQty} รายการ`;
+    document.getElementById('cart-total').textContent = `฿${totalPrice.toLocaleString()}`;
+}
+
+function animateBadge() {
+    const badge = document.getElementById('cart-count');
+    badge.classList.remove('badge-bounce');
+    void badge.offsetWidth;
+    badge.classList.add('badge-bounce');
+}
+
+// ============================================================
+// CART DRAWER
+// ============================================================
+function openCart() {
+    document.getElementById('cart-drawer').classList.add('open');
+    document.getElementById('cart-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+    document.getElementById('cart-drawer').classList.remove('open');
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.getElementById('cart-btn').addEventListener('click', openCart);
+
+// ============================================================
+// CONFIRM ORDER
+// ============================================================
+function confirmOrder() {
+    if (Object.keys(cart).length === 0) return;
+    closeCart();
+    clearCart();
+    showToast('สั่งอาหารเรียบร้อยแล้ว! 🎉');
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ============================================================
+// CATEGORY FILTER
+// ============================================================
+document.querySelectorAll('.cat-btn').forEach(btn => {
     btn.addEventListener('click', function () {
-        // เปลี่ยนสีปุ่ม
-        categories.forEach(b => {
-            b.classList.remove('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-900/40');
-            b.classList.add('text-gray-300', 'bg-gray-800/50', 'border', 'border-gray-700');
+        document.querySelectorAll('.cat-btn').forEach(b => {
+            b.classList.remove('active');
+            b.classList.add('text-gray-300', 'bg-gray-800/60', 'border-gray-700');
         });
-
-        this.classList.remove('text-gray-300', 'bg-gray-800/50', 'border', 'border-gray-700');
-        this.classList.add('bg-purple-600', 'text-white', 'shadow-lg', 'shadow-purple-900/40');
-
-        // filter เมนู
-        const value = this.value;
-
-        if (value === "all") {
-            renderMenus(menuall);
-        } else {
-            const filtered = menuall.filter(menu => menu.category === value);
-            renderMenus(filtered);
-        }
+        this.classList.add('active');
+        this.classList.remove('text-gray-300', 'bg-gray-800/60', 'border-gray-700');
+        activeCategory = this.dataset.cat;
+        renderMenus();
     });
 });
 
-        renderMenus(menuall);
-    </script>
+// ============================================================
+// SEARCH
+// ============================================================
+function onSearch(e) {
+    searchQuery = e.target.value;
+    // sync both inputs
+    document.getElementById('search-input').value = searchQuery;
+    document.getElementById('search-input-mobile').value = searchQuery;
+    renderMenus();
+}
+document.getElementById('search-input').addEventListener('input', onSearch);
+document.getElementById('search-input-mobile').addEventListener('input', onSearch);
 
-    
+// ============================================================
+// INIT
+// ============================================================
+updateCartUI();
+renderMenus();
+</script>
 </body>
 </html>
